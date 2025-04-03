@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>admin</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+    <link th:rel="stylesheet" th:href="@{/webjars/font-awesome/5.15.4/css/all.css} "/>
+    <script th:src="@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
+</head>
+<body>
+
+<script>
+    $(function () {
+        $("#message").hide();
+
+        $("#btnSave").click((function () {
+
+            let form = document.getElementById("addForm");
+
+            let productName = $('#productName').val();
+
+            if (productName === '')
+            {
+                $("#message").html("Phải nhập tên sản phẩm");
+                $("#message").show();
+            }
+            else
+                $("#frmSave").submit();
+        }))
+    })
+</script>
+
+<div th:fragment="AdminProductAdd">
+    <form action="/admin/product/save" method="post" enctype="multipart/form-data" id="frmSave">
+        <h4>Add Product</h4>
+
+        <div class="alert alert-warning" id="message">
+
+        </div>
+
+
+
+        <div class="mt-3 mb-3">
+            <label for="">Product Name</label>
+        <!--            name = tên trong entity -->
+            <input type="text" name="product_name" id="productName" class="form-control form-control-sm">
+        </div>
+
+        <div class="mt-3 mb-3">
+            <label for="">Price</label>
+            <input type="text" name="price" class="form-control form-control-sm">
+        </div>
+
+        <div class="mt-3 mb-3">
+            <label for="">Image</label>
+            <input type="file" name="image" class="form-control form-control-sm">
+        </div>
+
+        <div class="mt-3 mb-3">
+            <button type="button" id="btnSave" class="btn btn-primary btn-sm">Save</button>
+        </div>
+    </form>
+
+</div>
+
+
+</body>
+</html>

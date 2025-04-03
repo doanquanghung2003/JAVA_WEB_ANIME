@@ -1,0 +1,57 @@
+<div th:fragment="AdminPopularAnime">
+
+    <h1 style="text-align: center">List Anime</h1>
+
+    <a th:href="@{/admin/popularAnime/add}">Add Anime</a>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <td>Id</td>
+            <td>Anime Name</td>
+            <td>Title</td>
+            <td>Description</td>
+            <td>Hashtag</td>
+            <td>Image</td>
+            <td>Trailer</td>
+            <td>Link</td>
+            <td></td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="obj : ${popularAnimes}">
+            <td th:text="${obj.id}">Id</td>
+            <td th:text="${obj.animeName}">Anime Name</td>
+            <td th:text="${obj.title}">Title</td>
+            <td th:text="${obj.description}">Description</td>
+            <td th:text="${obj.hashtag}">Hashtag</td>
+
+            <td><img th:src="@{/images/anime/{imageName}(imageName=${obj.image})}" alt="Anime Image" style="max-width: 100px; max-height: 100px;"></td>
+
+            <td>
+                <video width="100" height="100" controls>
+                    <source th:src="@{/videos/{trailerName}(trailerName=${obj.trailer})}" type="video/mp4">
+                </video>
+            </td>
+            <td th:text="${obj.link}">Link</td>
+            <td><a th:href="${'/admin/popularAnime/edit/' + obj.id}">Edit</a></td>
+            <td><a th:href="${'/admin/popularAnime/delete/' + obj.id}">Delete</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link" th:href="${'/admin/popularAnime?page=' + (currentPage - 1)}" th:if="${currentPage > 0}">Previous</a></li>
+
+        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPage)}">
+            <a class="page-link" th:href="${'/admin/popularAnime?page=' + (i - 1)}" th:text="${i}">1</a>
+        </li>
+
+        <li class="page-item"><a class="page-link" th:href="${'/admin/popularAnime?page=' + (currentPage + 1)}" th:if="${currentPage < totalPage - 1}">Next</a></li>
+    </ul>
+
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</div>
