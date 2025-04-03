@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -27,7 +28,7 @@ public class Account {
 
     private String avatarUrl;
 
-    private Date createAt;
+    private LocalDateTime createAt;
 
     private Date updateAt;
 

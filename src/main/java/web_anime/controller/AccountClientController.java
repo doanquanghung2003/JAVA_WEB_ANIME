@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +39,28 @@ public class AccountClientController {
         model.addAttribute("account", new Account());
         model.addAttribute("page", "login");
         return "Client/client-index";
+    }
+
+    @ModelAttribute("loggedInAccount")
+    public Account getLoggedInAccount() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return null;
+        }
+
+        // If logged in by OAuth2
+        if (auth instanceof OAuth2AuthenticationToken) {
+            OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) auth;
+            OAuth2User oauth2User = oauthToken.getPrincipal();
+            String email = oauth2User.getAttribute("email");
+    
+            Account account = accountRepo.findAccountByEmail(email).orElse(null);
+    
+            return account;
+        }
+
+        return accountRepo.findByUsername(auth.getName()).orElse(null);
     }
 
     @PostMapping("/login")
@@ -73,12 +98,6 @@ public class AccountClientController {
 
     @GetMapping("/information-manager")
     public String information(Model model) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        Optional<Account> optionalAccount = accountRepo.findByUsername(username);
-        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
 
         model.addAttribute("page", "information-manager");
         return "Client/client-index";

@@ -45,7 +45,7 @@
                   <img th:src="${loggedInAccount.avatarUrl ?: '/images/default-avatar.png'}" alt="Avatar" class="avatar" width="100" height="100">
                   <div class="user-details">
                     <p style="color: white;" th:text="${loggedInAccount.displayName}">Tên người dùng</p>
-                    <p class="join-date" style="color: white;" th:text="'THAM GIA: ' + ${loggedInAccount.createAt}">THAM GIA: 01/01/2024</p>
+                    <!-- <p class="join-date" style="color: white;" th:text="'THAM GIA: ' + ${loggedInAccount.createAt}">THAM GIA: 01/01/2024</p> -->
                   </div>
                 </div>
               </div>
@@ -67,7 +67,7 @@
                     </li>
                     <li class="form-group d-flex align-items-center mb-3">
                       <label for="password" class="col-md-3 text-white">Mật khẩu</label>
-                      <input type="password" id="password" name="password" class="form-control col-md-9" th:value="${loggedInAccount.password}">
+                      <input disabled type="password" id="password" name="password" class="form-control col-md-9" th:value="${loggedInAccount.password}">
                     </li>
                     <li class="form-group d-flex align-items-center mb-3">
                       <label for="avatar" class="col-md-3 text-white">Avatar</label>
