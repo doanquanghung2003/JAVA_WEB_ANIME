@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Anime Template">
+    <meta name="keywords" content="Anime, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Anime | Vietsub</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/images/favicon.ico">
+
+    <!-- Google Font -->
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap}"
+          rel="stylesheet">
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700;800;900&display=swap}"
+          rel="stylesheet">
+
+    <!-- Css Styles -->
+
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/elegant-icons.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/plyr.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/nice-select.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/owl.carousel.min.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/slicknav.min.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/style.css}" type="text/css">
+
+</head>
+
+<body>
+<!-- Page Preloder -->
+<div id="preloder">
+    <div class="loader"></div>
+</div>
+
+<!-- Header Section Begin -->
+<header class="header">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-lg-2">
+                <div class="header__logo">
+                    <a href="/">
+                        <img th:src="@{/images/logo.png}" alt="">
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="header__nav">
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li class="active"><a th:href="@{/client-index}">Homepage</a></li>
+                            <li><a th:href="@{/Client/client-categories}">Thể Loại</a></li>
+                            <li><a th:href="@{/Client/client-blog}">Our Blog</a></li>
+                            <li><a th:href="@{/Client/client-contact}">Contacts</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="col-lg-2">
+                <div class="header__right">
+                    <form class="form-inline" th:action="@{/search}" method="GET">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm" aria-label="Search" name="data">
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-2">
+                <div class="header__nav">
+                    <div class="header__right header__menu mobile-menu">
+                        <ul>
+                            <li>
+                                <div class="user-profile">
+                                    <img id="profile-image" th:src="${loggedInAccount != null ? loggedInAccount.avatarUrl : '/images/default-avatar.png'}" alt="User Profile" class="rounded-circle dropdown-toggle" data-toggle="dropdown" width="40" height="40">
+                                    <ul class="dropdown">
+                                        <li><a class="dropdown-item" th:href="@{/information-manager}">Thông tin tài khoản</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/film-box}">Hộp Phim</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/history}">Lịch Sử</a></li>
+                                        <li th:if="${loggedInAccount != null}"><a class="dropdown-item" th:href="@{/logout}">Đăng xuất</a></li>
+                                        <li th:if="${loggedInAccount == null}"><a class="dropdown-item" th:href="@{/login}">Đăng nhập</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+</header>
+
+<!-- Header End -->
+
+
+<div th:replace="~{${content}}"></div>
+
+
+<div th:if="${page == 'client-index'}">
+    <!-- Hero Section Begin -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero__slider owl-carousel">
+                <div class="hero__items set-bg" th:data-setbg="@{/images/anime/luffyngoitau.jpg}">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hero__text">
+                                <div class="label">Adventure</div>
+                                <h2>One Piece</h2>
+                                <p>Hành trình trở thành Vua Hải Tặc...</p>
+                                <a href="#"><span>Watch Now</span> <i class="fa fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero__items set-bg" th:data-setbg="@{/images/hero/hero-1.jpg}">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hero__text">
+                                <div class="label">Adventure</div>
+                                <h2>Fate / Stay Night: Unlimited Blade Works</h2>
+                                <p>After 30 days of travel across the world...</p>
+                                <a href="#"><span>Watch Now</span> <i class="fa fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero__items set-bg" th:data-setbg="@{/images/anime/1.jpg}">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hero__text">
+                                <div class="label">Adventure</div>
+                                <h2>Fate / Stay Night: Unlimited Blade Works</h2>
+                                <p>After 30 days of travel across the world...</p>
+                                <a href="#"><span>Watch Now</span> <i class="fa fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Hero Section End -->
+
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="category__product" th:each="categoryAnime : ${categoryAnimeList}">
+                        <div class="row">
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="section-title">
+                                    <h4 th:text="${categoryAnime.categoryName}">Category Name</h4>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="btn__all">
+                                    <a th:href=" @{'/Client/client-categories/' + ${categoryAnime.categoryName}}" class="primary-btn">
+                                        View All<span class="arrow_right"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 col-sm-6" th:each="anime : ${categoryAnime.anime}">
+                                <div class="product__item">
+                                    <div class="product__item__pic set-bg" th:data-setbg="${anime.imageUrl != null ? anime.imageUrl : '/images/default.jpg'}">
+                                        <div class="ep">18 / 18</div>
+                                        <div class="comment"><i class="fa fa-comments"></i> 11</div>
+                                        <div class="view"><i class="fa fa-eye"></i> 9141</div>
+                                    </div>
+
+                                    <div class="product__item__text">
+                                        <ul>
+                                            <li>Active</li>
+                                            <li>Movie</li>
+                                        </ul>
+                                        <h5><a th:href="@{'/Client/animeDetail/' + ${anime.id}}" th:text="${anime.animeName}">Anime Name</a></h5>
+                                        <a th:href="@{'/Client/animeDetail/' + ${anime.id}}" class="watch-btn"> <span>Details</span> </a>
+                                        <a th:href="@{'/Client/anime-watching/' + ${anime.id}}" class="watch-btn"> <span>Watch Now</span> </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4 col-md-6 col-sm-8">
+                    <div class="product__sidebar">
+
+                        <div class="product__sidebar__view">
+                            <div class="section-title">
+                                <h5>Top Views</h5>
+                            </div>
+                            <ul class="filter__controls">
+                                <li class="active" data-filter="*">Day</li>
+                                <li data-filter=".week">Week</li>
+                                <li data-filter=".month">Month</li>
+                                <li data-filter=".years">Years</li>
+                            </ul>
+                            <div class="filter__gallery">
+                                <div class="product__sidebar__view__item set-bg mix day years"
+                                     th:data-setbg="@{images/sidebar/tv-1.jpg}">
+                                    <div class="ep">18 / ?</div>
+                                    <div class="view"><i class="fa fa-eye"></i> 9141</div>
+                                    <h5><a href="#">Boruto: Naruto next generations</a></h5>
+                                </div>
+                                <div class="product__sidebar__view__item set-bg mix month week"
+                                     th:data-setbg="@{images/sidebar/tv-2.jpg}">
+                                    <div class="ep">18 / ?</div>
+                                    <div class="view"><i class="fa fa-eye"></i> 9141</div>
+                                    <h5><a href="#">The Seven Deadly Sins: Wrath of the Gods</a></h5>
+                                </div>
+                                <div class="product__sidebar__view__item set-bg mix week years"
+                                     th:data-setbg="@{images/sidebar/tv-3.jpg}">
+                                    <div class="ep">18 / ?</div>
+                                    <div class="view"><i class="fa fa-eye"></i> 9141</div>
+                                    <h5><a href="#">Sword art online alicization war of underworld</a></h5>
+                                </div>
+                                <div class="product__sidebar__view__item set-bg mix years month"
+                                     th:data-setbg="@{images/sidebar/tv-4.jpg}">
+                                    <div class="ep">18 / ?</div>
+                                    <div class="view"><i class="fa fa-eye"></i> 9141</div>
+                                    <h5><a href="#">Fate/stay night: Heaven's Feel I. presage flower</a></h5>
+                                </div>
+                                <div class="product__sidebar__view__item set-bg mix day"
+                                     th:data-setbg="@{images/sidebar/tv-5.jpg}">
+                                    <div class="ep">18 / ?</div>
+                                    <div class="view"><i class="fa fa-eye"></i> 9141</div>
+                                    <h5><a href="#">Fate stay night unlimited blade works</a></h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product__sidebar__comment">
+                            <div class="section-title">
+                                <h5>New Comment</h5>
+                            </div>
+                            <div class="product__sidebar__comment__item">
+                                <div class="product__sidebar__comment__item__pic">
+                                    <img th:src="@{images/sidebar/comment-1.jpg}" alt="">
+                                </div>
+                                <div class="product__sidebar__comment__item__text">
+                                    <ul>
+                                        <li>Active</li>
+                                        <li>Movie</li>
+                                    </ul>
+                                    <h5><a href="#">The Seven Deadly Sins: Wrath of the Gods</a></h5>
+                                    <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
+                                </div>
+                            </div>
+                            <div class="product__sidebar__comment__item">
+                                <div class="product__sidebar__comment__item__pic">
+                                    <img th:src="@{images/sidebar/comment-2.jpg}" alt="">
+                                </div>
+                                <div class="product__sidebar__comment__item__text">
+                                    <ul>
+                                        <li>Active</li>
+                                        <li>Movie</li>
+                                    </ul>
+                                    <h5><a href="#">Shirogane Tamashii hen Kouhan sen</a></h5>
+                                    <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
+                                </div>
+                            </div>
+                            <div class="product__sidebar__comment__item">
+                                <div class="product__sidebar__comment__item__pic">
+                                    <img th:src="@{images/sidebar/comment-3.jpg}" alt="">
+                                </div>
+                                <div class="product__sidebar__comment__item__text">
+                                    <ul>
+                                        <li>Active</li>
+                                        <li>Movie</li>
+                                    </ul>
+                                    <h5><a href="#">Kizumonogatari III: Reiket su-hen</a></h5>
+                                    <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
+                                </div>
+                            </div>
+                            <div class="product__sidebar__comment__item">
+                                <div class="product__sidebar__comment__item__pic">
+                                    <img th:src="@{images/sidebar/comment-4.jpg}" alt="">
+                                </div>
+                                <div class="product__sidebar__comment__item__text">
+                                    <ul>
+                                        <li>Active</li>
+                                        <li>Movie</li>
+                                    </ul>
+                                    <h5><a href="#">Monogatari Series: Second Season</a></h5>
+                                    <span><i class="fa fa-eye"></i> 19.141 Viewes</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- Product Section End -->
+
+</div>
+
+
+
+
+<div th:if="${page == 'Client/client-contact'}">
+    <div th:replace="~{Client/client-contact.html::Contact}"></div>
+</div>
+
+<div th:if="${page == 'Client/client-search'}">
+    <div th:replace="~{Client/client-search::Search}"></div>
+</div>
+
+<div th:if="${page == 'Client/client-blog'}">
+    <div th:replace="~{Client/client-blog.html::Blog}"></div>
+</div>
+
+<div th:if="${page == 'information-manager'}">
+    <div th:replace="~{Client/information-manager::InformationManager}"></div>
+</div>
+
+<div th:if="${page == 'Client/client-blogDetails'}">
+    <div th:replace="~{Client/blog-details.html::BlogDetails}"></div>
+</div>
+
+<div th:if="${page == 'Client/client-categories'}">
+    <div th:replace="~{Client/client-categories::Categories}"></div>
+</div>
+
+
+<div th:if="${page == 'Client/animeDetail'}">
+    <div th:replace="~{Client/anime-details.html::AnimeDetails}"></div>
+</div>
+
+<div th:if="${page == 'Client/anime-watching'}">
+    <div th:replace="~{Client/anime-watching.html::AnimeWatching}"></div>
+</div>
+
+<div th:if="${page == 'signup'}">
+    <div th:replace="~{signup.html::SignUp}"></div>
+</div>
+
+<div th:if="${page == 'login'}">
+    <div th:replace="~{login.html::Login}"></div>
+</div>
+
+<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+<!-- Footer Section Begin -->
+<footer class="footer">
+    <div class="page-up">
+        <a href="#" id="scrollToTopButton"><span class="arrow_carrot-up"></span></a>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="footer__logo">
+                    <a href="./index.html"><img th:src="@{/images/logo.png}" alt=""></a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="footer__nav">
+                    <ul>
+                        <li class="active"><a href="/">Homepage</a></li>
+                        <li class="active"><a href="/client-categories">Categories</a></li>
+                        <li class="active"><a href="/client-blog">Our Blog</a></li>
+                        <li class="active"><a href="/client-contact">Contacts</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <p>
+                    Copyright &copy;<script>document.write(new Date().getFullYear());</script>
+                    <i class="fa fa-heart" aria-hidden="true"></i> by
+                    <a href="https://facebook.com" target="_blank">Hưng JiKa</a></p>
+
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Footer Section End -->
+
+<!-- Search model Begin -->
+<div class="search-model">
+    <div class="h-100 d-flex align-items-center justify-content-center">
+        <div class="search-close-switch"><i class="icon_close"></i></div>
+        <form class="search-model-form">
+            <div class="input-group">
+                <input type="text" id="search-input" class="form-control" placeholder="Search here.....">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const player = document.getElementById("player");
+        const source = document.getElementById("videoSource");
+
+        document.querySelectorAll(".episode-btn").forEach(btn => {
+            btn.addEventListener("click", async (e) => {
+                e.preventDefault();
+                const newUrl = btn.dataset.videoUrl;
+
+                if (newUrl && newUrl !== source.src) {
+                    try {
+
+                        source.src = newUrl;
+                        await player.load();
+                        await player.play();
+                    } catch (error) {
+                        console.error("Lỗi phát video:", error);
+                        alert("Không thể phát video: " + error.message);
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/player.js}"></script>
+<script th:src="@{/js/jquery.nice-select.min.js}"></script>
+<script th:src="@{/js/mixitup.min.js}"></script>
+<script th:src="@{/js/jquery.slicknav.js}"></script>
+<script th:src="@{/js/owl.carousel.min.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+
+</body>
+</html>
