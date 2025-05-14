@@ -29,7 +29,6 @@ public class AdminController {
 
         Optional<Account> optionalAccount = accountRepo.findByUsername(username);
         model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
-
         model.addAttribute("page", "admin");
         return "Admin/admin-index";
     }

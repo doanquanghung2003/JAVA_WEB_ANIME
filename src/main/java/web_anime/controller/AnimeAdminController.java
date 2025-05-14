@@ -3,14 +3,18 @@ package web_anime.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web_anime.config.CloudinaryConfig;
+import web_anime.entity.Account;
 import web_anime.entity.Anime;
 import web_anime.entity.CategoryAnime;
 import web_anime.entity.Episode;
+import web_anime.repository.AccountRepository;
 import web_anime.repository.AnimeRepository;
 import web_anime.repository.CategoryAnimeRepository;
 import web_anime.repository.EpisodeRepository;
@@ -28,6 +32,9 @@ public class AnimeAdminController {
 
     @Autowired
     private AnimeRepository animeRepo;
+
+    @Autowired
+    private AccountRepository accountRepo;
 
     @Autowired
     private CategoryAnimeRepository categoryAnimeRepository;
@@ -57,11 +64,17 @@ public class AnimeAdminController {
         int pageSize = 3;
         Page<Anime> animePage = animeRepo.findAll(PageRequest.of(page, pageSize));
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         model.addAttribute("animeList", animePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPage", animePage.getTotalPages());
+        model.addAttribute("page", "/Admin/anime-list");
 
-        return "admin/anime-list";
+        Optional<Account> optionalAccount = accountRepo.findByUsername(username);
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+        return "Admin/admin-index";
     }
 
     @GetMapping("/add")
