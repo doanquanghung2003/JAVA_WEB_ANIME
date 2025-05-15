@@ -1,5 +1,13 @@
-<div th:fragment="AnimeList">
-    <!-- Content Start -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layouts/admin-layout}">
+<head>
+    <title>Anime List</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Content Start -->
         <!-- Recent Sales Start -->
         <div class="container-fluid pt-4 px-4">
             <div class="bg-secondary text-center rounded p-4">
@@ -71,4 +79,5 @@
         </div>
         <!-- Recent Sales End -->
     </div>
-</div>
+</body>
+</html>

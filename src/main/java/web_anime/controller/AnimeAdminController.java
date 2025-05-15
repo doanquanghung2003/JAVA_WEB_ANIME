@@ -70,11 +70,10 @@ public class AnimeAdminController {
         model.addAttribute("animeList", animePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPage", animePage.getTotalPages());
-        model.addAttribute("page", "/Admin/anime-list");
 
         Optional<Account> optionalAccount = accountRepo.findByUsername(username);
         model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
-        return "Admin/admin-index";
+        return "Admin/anime-list";
     }
 
     @GetMapping("/add")
