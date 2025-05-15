@@ -73,6 +73,7 @@ public class AnimeAdminController {
 
         Optional<Account> optionalAccount = accountRepo.findByUsername(username);
         model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+
         return "Admin/anime-list";
     }
 
@@ -80,6 +81,13 @@ public class AnimeAdminController {
     public String showFormForAdd(Model model) {
         List<CategoryAnime> categoryAnimes = categoryAnimeRepository.findAll();
         model.addAttribute("categoryAnimes", categoryAnimes);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<Account> optionalAccount = accountRepo.findByUsername(username);
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+
         return "/Admin/admin-anime-add";
     }
 
@@ -139,6 +147,13 @@ public class AnimeAdminController {
         model.addAttribute("episodes", anime.getEpisodes());
         model.addAttribute("episodes", episodes);
         model.addAttribute("categoryAnimes", categoryAnimes);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<Account> optionalAccount = accountRepo.findByUsername(username);
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+
         return "/Admin/admin-anime-edit";
     }
 
