@@ -45,12 +45,7 @@ public class AccountAdminController {
         String username = authentication.getName();
 
         Optional<Account> optionalAccount = accountRepo.findByUsername(username);
-        if (optionalAccount.isPresent()) {
-            Account loggedInAccount = optionalAccount.get();
-            model.addAttribute("loggedInAccount", loggedInAccount);
-        } else {
-            model.addAttribute("loggedInAccount", null);
-        }
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
 
         List<Account> accountList = pageAccount.toList();
         System.out.println(accountList);
@@ -60,11 +55,18 @@ public class AccountAdminController {
         model.addAttribute("currentPage", pageable.getPageNumber());
         model.addAttribute("page", "/Admin/account-list");
 
-        return "/Admin/admin-index";
+        return "/Admin/account-list";
     }
 
     @GetMapping("/admin/account/add")
     public String showAddForm(Model model) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<Account> optionalAccount = accountRepo.findByUsername(username);
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+
         model.addAttribute("account", new Account());
         return "/Admin/admin-account-add";
     }
@@ -90,6 +92,12 @@ public class AccountAdminController {
         if (optionalAccount.isEmpty()) {
             throw new IllegalArgumentException("Invalid account Id: " + id);
         }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+
         Account account = optionalAccount.get();
         model.addAttribute("admin", account);
         return "/Admin/admin-account-edit";
