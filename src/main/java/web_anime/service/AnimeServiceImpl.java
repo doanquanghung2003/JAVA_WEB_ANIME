@@ -30,6 +30,12 @@ public class AnimeServiceImpl implements AnimeService {
         return animeRepo.findAll();
     }
 
+    @Override
+    public Anime findById(Integer id) {
+        return animeRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy anime với id: " + id));
+    }
+
     @Transactional
     public void deleteAnime(Integer animeId) {
         if (!animeRepo.existsById(animeId)) {

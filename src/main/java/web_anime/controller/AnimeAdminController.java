@@ -101,37 +101,72 @@ public class AnimeAdminController {
                        @RequestParam String link,
                        @RequestParam Integer category_anime_id,
                        @RequestParam Integer episodeCount,
-                       @RequestParam MultipartFile[] episodes) throws IOException {
-
-        String imageUrl = cloudinaryService.uploadFile(image);
-        String trailerUrl = cloudinaryService.uploadFile(trailer);
-
-        Anime anime = new Anime();
-        anime.setAnimeName(animeName);
-        anime.setTitle(title);
-        anime.setDescription(description);
-        anime.setHashtag(hashtag);
-        anime.setImageUrl(imageUrl);
-        anime.setTrailerUrl(trailerUrl);
-        anime.setLink(link);
-
-        Optional<CategoryAnime> categoryAnime = categoryAnimeRepository.findById(category_anime_id);
-        categoryAnime.ifPresent(anime::setCategoryAnime);
-
-        animeRepo.save(anime);
-
-        for (int i = 0; i < episodeCount; i++) {
-            if (i < episodes.length && !episodes[i].isEmpty()) {
-                String episodeVideoUrl = cloudinaryService.uploadFile(episodes[i]);
-                Episode episode = new Episode();
-                episode.setEpisodeNumber(i + 1);
-                episode.setVideoUrl(episodeVideoUrl);
-                episode.setAnime(anime);
-                episodeRepository.save(episode);
+                       @RequestParam(required = false) MultipartFile[] episodes,
+                       Model model) {
+        try {
+            // Validate input
+            if (animeName == null || animeName.trim().isEmpty()) {
+                model.addAttribute("error", "Tên anime không được để trống");
+                return "redirect:/admin/anime/add?error=name";
             }
-        }
 
-        return "redirect:/admin/anime";
+            // Check if category exists
+            Optional<CategoryAnime> categoryAnime = categoryAnimeRepository.findById(category_anime_id);
+            if (categoryAnime.isEmpty()) {
+                model.addAttribute("error", "Danh mục không tồn tại");
+                return "redirect:/admin/anime/add?error=category";
+            }
+
+            // Upload files
+            String imageUrl = null;
+            String trailerUrl = null;
+            try {
+                imageUrl = cloudinaryService.uploadFile(image);
+                trailerUrl = cloudinaryService.uploadFile(trailer);
+            } catch (IOException e) {
+                model.addAttribute("error", "Lỗi upload file: " + e.getMessage());
+                return "redirect:/admin/anime/add?error=upload";
+            }
+
+            // Create and save anime
+            Anime anime = new Anime();
+            anime.setAnimeName(animeName);
+            anime.setTitle(title);
+            anime.setDescription(description);
+            anime.setHashtag(hashtag);
+            anime.setImageUrl(imageUrl);
+            anime.setTrailerUrl(trailerUrl);
+            anime.setLink(link);
+            anime.setCategoryAnime(categoryAnime.get());
+            anime.setViewCount(0);
+            anime.setRating(0.0);
+
+            animeRepo.save(anime);
+
+            // Save episodes if any
+            if (episodes != null && episodes.length > 0) {
+                for (int i = 0; i < episodeCount; i++) {
+                    if (i < episodes.length && episodes[i] != null && !episodes[i].isEmpty()) {
+                        try {
+                            String episodeVideoUrl = cloudinaryService.uploadFile(episodes[i]);
+                            Episode episode = new Episode();
+                            episode.setEpisodeNumber(i + 1);
+                            episode.setVideoUrl(episodeVideoUrl);
+                            episode.setAnime(anime);
+                            episodeRepository.save(episode);
+                        } catch (IOException e) {
+                            model.addAttribute("error", "Lỗi upload tập " + (i + 1) + ": " + e.getMessage());
+                            return "redirect:/admin/anime/add?error=episode";
+                        }
+                    }
+                }
+            }
+
+            return "redirect:/admin/anime?success";
+        } catch (Exception e) {
+            model.addAttribute("error", "Lỗi không xác định: " + e.getMessage());
+            return "redirect:/admin/anime/add?error=unknown";
+        }
     }
 
     @GetMapping("/edit/{id}")

@@ -192,7 +192,7 @@
                                             th:data-setbg="${anime.imageUrl != null ? anime.imageUrl : '/images/default.jpg'}">
                                             <div class="ep">18 / 18</div>
                                             <div class="comment"><i class="fa fa-comments"></i> 11</div>
-                                            <div class="view"><i class="fa fa-eye"></i> 9141</div>
+                                            <div class="view"><i class="fa fa-eye"></i> <span th:text="${anime.viewCount}">0</span></div>
                                         </div>
 
                                         <div class="product__item__text">
@@ -428,7 +428,60 @@
         document.addEventListener("DOMContentLoaded", () => {
             const player = document.getElementById("player");
             const source = document.getElementById("videoSource");
+            let watchStartTime = null;
+            let watchDuration = 0;
+            let watchInterval = null;
 
+            // Hàm bắt đầu theo dõi thời gian xem
+            function startWatching(animeId, accountId) {
+                if (!animeId || !accountId) return;
+                
+                // Gọi API bắt đầu theo dõi
+                fetch(`/api/view-tracking/start/${animeId}?accountId=${accountId}`, {
+                    method: 'POST'
+                });
+
+                watchStartTime = Date.now();
+                watchDuration = 0;
+
+                // Cập nhật thời gian xem mỗi 5 giây
+                watchInterval = setInterval(() => {
+                    watchDuration = Math.floor((Date.now() - watchStartTime) / 1000);
+                    
+                    // Gọi API cập nhật thời gian xem
+                    fetch(`/api/view-tracking/update/${animeId}?accountId=${accountId}&duration=${watchDuration}`, {
+                        method: 'POST'
+                    });
+                }, 5000);
+            }
+
+            // Hàm dừng theo dõi
+            function stopWatching() {
+                if (watchInterval) {
+                    clearInterval(watchInterval);
+                    watchInterval = null;
+                }
+                watchStartTime = null;
+                watchDuration = 0;
+            }
+
+            // Xử lý khi video bắt đầu phát
+            if (player) {
+                player.addEventListener('play', () => {
+                    const videoPlayer = document.querySelector('.anime__video__player');
+                    const animeId = videoPlayer?.getAttribute('data-anime-id');
+                    const accountId = videoPlayer?.getAttribute('data-account-id');
+                    startWatching(animeId, accountId);
+                });
+
+                // Xử lý khi video tạm dừng
+                player.addEventListener('pause', stopWatching);
+                
+                // Xử lý khi video kết thúc
+                player.addEventListener('ended', stopWatching);
+            }
+
+            // Xử lý chuyển tập phim
             document.querySelectorAll(".episode-btn").forEach(btn => {
                 btn.addEventListener("click", async (e) => {
                     e.preventDefault();
@@ -436,10 +489,16 @@
 
                     if (newUrl && newUrl !== source.src) {
                         try {
-
+                            stopWatching(); // Dừng theo dõi tập cũ
                             source.src = newUrl;
                             await player.load();
                             await player.play();
+                            
+                            // Bắt đầu theo dõi tập mới
+                            const videoPlayer = document.querySelector('.anime__video__player');
+                            const animeId = videoPlayer?.getAttribute('data-anime-id');
+                            const accountId = videoPlayer?.getAttribute('data-account-id');
+                            startWatching(animeId, accountId);
                         } catch (error) {
                             console.error("Lỗi phát video:", error);
                             alert("Không thể phát video: " + error.message);

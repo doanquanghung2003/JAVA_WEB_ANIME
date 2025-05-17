@@ -12,4 +12,6 @@ public interface AccountService extends UserDetailsService {
     List<Account> getAll();
 
     void add(Account account);
+
+    Account findById(Integer id);
 }

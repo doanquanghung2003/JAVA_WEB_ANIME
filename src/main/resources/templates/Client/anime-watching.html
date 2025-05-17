@@ -23,7 +23,7 @@
 
         <div class="anime__watching__list">
             <div class="anime__item">
-                <div class="anime__video__player">
+                <div class="anime__video__player" th:data-anime-id="${anime.id}" th:data-account-id="${loggedInAccount.id}">
 
                   <div th:if="${anime != null}">
                     <video id="player" playsinline controls>

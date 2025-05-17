@@ -32,6 +32,12 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
+    public Account findById(Integer id) {
+        return accountRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản với id: " + id));
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Account> accountOpt = accountRepo.findByUsername(username);
 

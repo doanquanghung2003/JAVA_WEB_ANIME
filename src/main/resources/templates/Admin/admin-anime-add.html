@@ -11,20 +11,35 @@
     $(function () {
         $("#message").hide();
 
-        $("#btnSave").click(function () {
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
             let animeName = $('#animeName').val();
+            let categoryId = $('#category_anime_id').val();
 
             if (animeName === '') {
                 $("#message").html("Phải nhập tên anime");
                 $("#message").show();
-            } else {
-                $("#frmSave").submit();
+                return;
             }
+
+            if (!categoryId) {
+                $("#message").html("Vui lòng chọn danh mục");
+                $("#message").show();
+                return;
+            }
+
+            $("#frmSave").submit();
         });
     });
 
     function generateEpisodeInputs() {
         const episodeCount = document.getElementById('episodeCount').value;
+        if (episodeCount < 1) {
+            alert("Số lượng tập phải lớn hơn 0");
+            document.getElementById('episodeCount').value = 1;
+            return;
+        }
+        
         const episodeInputsContainer = document.getElementById('episodeInputs');
         episodeInputsContainer.innerHTML = '';
 
@@ -32,7 +47,7 @@
             const inputHTML = `
             <div class="mb-3">
                 <label for="episode${i}" class="form-label">Tập ${i}:</label>
-                <input class="form-control" type="file" id="episode${i}" name="episodes" required>
+                <input class="form-control" type="file" id="episode${i}" name="episodes" accept="video/*">
             </div>
         `;
             episodeInputsContainer.insertAdjacentHTML('beforeend', inputHTML);
@@ -47,7 +62,20 @@
         <div class="col-sm-12 col-md-8 col-lg-6">
             <div class="bg-secondary rounded p-4">
                 <h6 class="mb-4 text-center">Add Anime</h6>
-                <form th:action="@{/admin/anime/save}" method="post" enctype="multipart/form-data">
+                
+                <!-- Error Message -->
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                    <span th:text="${error}">Error message</span>
+                </div>
+                
+                <!-- Success Message -->
+                <div th:if="${param.success}" class="alert alert-success" role="alert">
+                    Thêm anime thành công!
+                </div>
+
+                <div id="message" class="alert alert-danger" role="alert"></div>
+
+                <form th:action="@{/admin/anime/save}" method="post" enctype="multipart/form-data" id="frmSave">
                     <div class="mb-3">
                         <label for="animeName" class="form-label">Anime Name:</label>
                         <input type="text" class="form-control" id="animeName" name="animeName" required>
@@ -66,11 +94,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">Image:</label>
-                        <input class="form-control" type="file" id="image" name="image" required>
+                        <input class="form-control" type="file" id="image" name="image" accept="image/*" required>
                     </div>
                     <div class="mb-3">
                         <label for="trailer" class="form-label">Trailer:</label>
-                        <input class="form-control" type="file" id="trailer" name="trailer" required>
+                        <input class="form-control" type="file" id="trailer" name="trailer" accept="video/*" required>
                     </div>
                     <div class="mb-3">
                         <label for="link" class="form-label">Link:</label>
@@ -79,7 +107,7 @@
                     <div class="mb-3">
                         <label for="category_anime_id" class="form-label">Category:</label>
                         <select class="form-select" id="category_anime_id" name="category_anime_id" required>
-                            <option value="" disabled selected>Chọn danh mục</option>
+                            <option value="">Chọn danh mục</option>
                             <option th:each="category : ${categoryAnimes}"
                                     th:value="${category.id}"
                                     th:text="${category.categoryName}"></option>
@@ -87,10 +115,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="episodeCount" class="form-label">Số lượng tập:</label>
-                        <input type="number" class="form-control" id="episodeCount" name="episodeCount" required onchange="generateEpisodeInputs()">
+                        <input type="number" class="form-control" id="episodeCount" name="episodeCount" min="1" value="1" required onchange="generateEpisodeInputs()">
                     </div>
                     <div id="episodeInputs"></div>
-                    <button type="submit" class="btn btn-primary w-100">Add Anime</button>
+                    <button type="submit" class="btn btn-primary w-100" id="btnSave">Add Anime</button>
                 </form>
             </div>
         </div>
