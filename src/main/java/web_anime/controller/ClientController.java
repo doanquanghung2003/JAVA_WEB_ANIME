@@ -88,6 +88,7 @@ public class ClientController {
 
         model.addAttribute("categoryAnimeList", categoryAnimeShowDTOS);
         model.addAttribute("page", "client-index");
+        model.addAttribute("topViewedAnimes", animeRepo.findTop5ByOrderByViewCountDesc());
         return "Client/client-index";
     }
 

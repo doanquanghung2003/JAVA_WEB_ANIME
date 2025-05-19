@@ -37,4 +37,7 @@ public interface AnimeRepository extends JpaRepository<Anime, Integer> {
 
     List<Anime> findByCategoryAnime_Id(Integer categoryId);
 
+    @Query(value = "SELECT * FROM anime ORDER BY view_count DESC LIMIT 5", nativeQuery = true)
+    List<Anime> findTop5ByOrderByViewCountDesc();
+
 }
