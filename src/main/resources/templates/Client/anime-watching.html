@@ -23,7 +23,7 @@
 
         <div class="anime__watching__list">
             <div class="anime__item">
-                <div class="anime__video__player" th:data-anime-id="${anime.id}" th:data-account-id="${loggedInAccount.id}">
+                <div class="anime__video__player" th:data-anime-id="${anime.id}" th:data-account-id="${loggedInAccount != null ? loggedInAccount.id : ''}">
 
                   <div th:if="${anime != null}">
                     <video id="player" playsinline controls>
@@ -62,72 +62,32 @@
           <div class="section-title">
             <h5>Reviews</h5>
           </div>
-          <div class="anime__review__item">
-            <div class="anime__review__item__pic">
-              <img th:src="@{/images/anime/review-1.jpg}" alt="">
-            </div>
-            <div class="anime__review__item__text">
-              <h6>Chris Curry - <span>1 Hour ago</span></h6>
-              <p>whachikan Just noticed that someone categorized this as belonging to the genre
-                "demons" LOL</p>
-            </div>
-          </div>
-          <div class="anime__review__item">
-            <div class="anime__review__item__pic">
-              <img th:src="@{/images/anime/review-2.jpg}" alt="">
-            </div>
-            <div class="anime__review__item__text">
-              <h6>Lewis Mann - <span>5 Hour ago</span></h6>
-              <p>Finally it came out ages ago</p>
-            </div>
-          </div>
-          <div class="anime__review__item">
-            <div class="anime__review__item__pic">
-              <img th:src="@{/images/anime/review-3.jpg}" alt="">
-            </div>
-            <div class="anime__review__item__text">
-              <h6>Louis Tyler - <span>20 Hour ago</span></h6>
-              <p>Where is the episode 15 ? Slow update! Tch</p>
-            </div>
-          </div>
-          <div class="anime__review__item">
-            <div class="anime__review__item__pic">
-              <img th:src="@{/images/anime/review-4.jpg}" alt="">
-            </div>
-            <div class="anime__review__item__text">
-              <h6>Chris Curry - <span>1 Hour ago</span></h6>
-              <p>whachikan Just noticed that someone categorized this as belonging to the genre
-                "demons" LOL</p>
-            </div>
-          </div>
-          <div class="anime__review__item">
-            <div class="anime__review__item__pic">
-              <img th:src="@{/images/anime/review-5.jpg}" alt="">
-            </div>
-            <div class="anime__review__item__text">
-              <h6>Lewis Mann - <span>5 Hour ago</span></h6>
-              <p>Finally it came out ages ago</p>
-            </div>
-          </div>
-          <div class="anime__review__item">
-            <div class="anime__review__item__pic">
-              <img th:src="@{/images/anime/review-6.jpg}" alt="">
-            </div>
-            <div class="anime__review__item__text">
-              <h6>Louis Tyler - <span>20 Hour ago</span></h6>
-              <p>Where is the episode 15 ? Slow update! Tch</p>
+          <div id="commentList">
+            <div th:each="comment : ${comments}" class="anime__review__item">
+              <div class="anime__review__item__pic">
+                <img class="rounded-circle" th:src="${loggedInAccount != null ? loggedInAccount.avatarUrl : '/img-admin/default-avatar.png'}" alt="" style="width: 40px; height: 40px;">
+              </div>
+              <div class="anime__review__item__text">
+                <h6 th:text="${comment.account.username} + ' - ' + ${#temporals.format(comment.createAt, 'dd/MM/yyyy HH:mm')}"></h6>
+                <p th:text="${comment.comment}"></p>
+              </div>
             </div>
           </div>
         </div>
+
         <div class="anime__details__form">
           <div class="section-title">
             <h5>Your Comment</h5>
           </div>
-          <form action="#">
-            <textarea placeholder="Your Comment"></textarea>
+          <div th:if="${loggedInAccount == null}" class="alert alert-warning">
+            Vui lòng <a href="/login">đăng nhập</a> để bình luận
+          </div>
+          <form id="commentForm">
+            <textarea id="commentInput" placeholder="Your Comment"></textarea>
             <button type="submit"><i class="fa fa-location-arrow"></i> Review</button>
           </form>
         </div>
+
       </div>
 
       <div class="col-lg-4 col-md-4">
@@ -161,7 +121,100 @@
   </div>
 </section>
 <!-- Anime Section End -->
+  <script th:inline="javascript">
+  console.log('Script started');
+
+  /*<![CDATA[*/
+  const animeId = /*[[${anime.id}]]*/ null;
+  const loggedInAccount = /*[[${loggedInAccount}]]*/ null;
+  const accountId = loggedInAccount != null ? loggedInAccount.id : null;
+  const username = loggedInAccount != null ? loggedInAccount.username : null;
+  const csrfToken = /*[[${_csrf.token}]]*/ '';
+  /*]]>*/
+
+  console.log('Variables initialized:', { animeId, accountId, username, csrfToken });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log('DOM loaded');
+
+    const commentForm = document.getElementById("commentForm");
+    const commentInput = document.getElementById("commentInput");
+    const commentList = document.getElementById("commentList");
+
+    console.log('Form elements:', { commentForm, commentInput, commentList });
+
+    if (commentForm) {
+      console.log('Adding submit event listener');
+
+      commentForm.addEventListener("submit", function (event) {
+        console.log('Form submitted');
+        event.preventDefault();
+
+        if (!commentInput.value.trim()) {
+          alert("Vui lòng nhập nội dung bình luận!");
+          return;
+        }
+
+        if (!accountId) {
+          alert("Vui lòng đăng nhập để bình luận!");
+          return;
+        }
+
+        const requestBody = {
+          accountId: accountId,
+          comment: commentInput.value.trim()
+        };
+
+        console.log('Sending request:', requestBody);
+
+        fetch(`/api/comments/${animeId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken
+          },
+          body: JSON.stringify(requestBody)
+        })
+                .then(response => {
+                  console.log('Response received:', response.status);
+                  if (!response.ok) {
+                    return response.text().then(text => {
+                      throw new Error(`Lỗi khi gửi bình luận: ${text}`);
+                    });
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('Comment saved:', data);
+                  const newComment = document.createElement("div");
+                  newComment.classList.add("anime__review__item");
+                  newComment.innerHTML = `
+                <div class="anime__review__item__pic">
+                    <img src="/images/anime/default-avatar.png" alt="">
+                </div>
+                <div class="anime__review__item__text">
+                    <h6>${username} - <span>Just now</span></h6>
+                    <p>${data.comment}</p>
+                </div>
+            `;
+                  commentList.prepend(newComment);
+                  commentInput.value = "";
+                })
+                .catch(err => {
+                  console.error('Error:', err);
+                  alert("Có lỗi xảy ra khi gửi bình luận: " + err.message);
+                });
+      });
+    }
+
+
+  });
+
+</script>
 </div>
+
+
+
 
 
 

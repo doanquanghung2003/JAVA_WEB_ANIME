@@ -22,17 +22,18 @@ public class ConfigSecurity {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationProvider authenticationProvider) throws Exception {
-        httpSecurity.csrf().disable();
+        httpSecurity
+                .csrf(csrf -> csrf
+                    .ignoringRequestMatchers("/api/**")  // Cho phép các API endpoint không cần CSRF
+                );
 
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(arrPath).permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/fonts/**", "/sass/**", "/Source/**", "/videos/**").permitAll()
-                        .requestMatchers("/signup", "/signup/save").permitAll()
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/signup", "/signup/save", "/login", "/oauth2/**").permitAll()
                         .requestMatchers("/client-contact").hasRole("CLIENT")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-
                         .anyRequest().authenticated()
                 )
             // OAuth2 Login
@@ -47,7 +48,8 @@ public class ConfigSecurity {
                 .formLogin(form -> form
                          .loginPage("/login")
                          .defaultSuccessUrl("/", true)
-                        .permitAll()
+                         .failureUrl("/login?error=true")
+                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")

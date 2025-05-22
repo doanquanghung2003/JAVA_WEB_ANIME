@@ -30,6 +30,9 @@ public class Anime {
     @OneToMany(mappedBy = "anime", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Episode> episodes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "anime", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_anime_id", referencedColumnName = "id")
     private CategoryAnime categoryAnime;

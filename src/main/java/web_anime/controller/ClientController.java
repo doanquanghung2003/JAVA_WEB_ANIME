@@ -20,9 +20,12 @@ import web_anime.dto.CategoryAnimeShowDTO;
 import web_anime.entity.Account;
 import web_anime.entity.Anime;
 import web_anime.entity.CategoryAnime;
+import web_anime.entity.Comment;
 import web_anime.repository.AccountRepository;
 import web_anime.repository.AnimeRepository;
 import web_anime.repository.CategoryAnimeRepository;
+import web_anime.service.AnimeService;
+import web_anime.service.CommentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +45,12 @@ public class ClientController {
     @Autowired
     private AccountRepository accountRepo;
 
+    @Autowired
+    private AnimeService animeService;
+
+    @Autowired
+    private CommentService commentService;
+
     @ModelAttribute("loggedInAccount")
     public Account getLoggedInAccount() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -49,9 +58,6 @@ public class ClientController {
         if (auth == null || !auth.isAuthenticated()) {
             return null;
         }
-        // System.out.println("Principal: " + auth.getPrincipal());
-
-        // If logged in by OAuth2
         if (auth instanceof OAuth2AuthenticationToken) {
             OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) auth;
             OAuth2User oauth2User = oauthToken.getPrincipal();
@@ -136,7 +142,19 @@ public class ClientController {
             theCategoryAnimeShowDTOS.add(theCategoryAnimeShowDTO);
         });
 
-        Anime anime = animeRepo.findById(id).orElse(null);
+        Optional<Anime> optionalAnime = animeRepo.findByIdWithEpisodes(id);
+        Anime anime = optionalAnime.get();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<Account> optionalAccount = accountRepo.findByUsername(username);
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+
+        // Thêm danh sách comment vào model
+        List<Comment> comments = commentService.getCommentsByAnime(anime);
+        model.addAttribute("comments", comments);
+
+
         if (anime != null) {
             model.addAttribute("anime", anime);
             model.addAttribute("categoryAnimeList", theCategoryAnimeShowDTOS);
@@ -162,6 +180,16 @@ public class ClientController {
         if (anime.getEpisodes() == null) {
             anime.setEpisodes(new ArrayList<>());
         }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        Optional<Account> optionalAccount = accountRepo.findByUsername(username);
+        model.addAttribute("loggedInAccount", optionalAccount.orElse(null));
+
+        // Thêm danh sách comment vào model
+        List<Comment> comments = commentService.getCommentsByAnime(anime);
+        model.addAttribute("comments", comments);
 
         model.addAttribute("anime", anime);
         model.addAttribute("page", "Client/anime-watching");

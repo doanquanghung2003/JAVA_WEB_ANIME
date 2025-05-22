@@ -190,8 +190,8 @@
                                     <div class="product__item">
                                         <div class="product__item__pic set-bg"
                                             th:data-setbg="${anime.imageUrl != null ? anime.imageUrl : '/images/default.jpg'}">
-                                            <div class="ep">18 / 18</div>
-                                            <div class="comment"><i class="fa fa-comments"></i> 11</div>
+                                            <div class="ep" th:text="${anime.episodes != null ? anime.episodes.size() + ' / ' + anime.episodes.size() : '0 / 0'}">? / ?</div>
+                                            <div class="comment"><i class="fa fa-comments"></i> <span th:text="${anime.comments != null ? anime.comments.size() : 0}">0</span></div>
                                             <div class="view"><i class="fa fa-eye"></i> <span th:text="${anime.viewCount}">0</span></div>
                                         </div>
 
