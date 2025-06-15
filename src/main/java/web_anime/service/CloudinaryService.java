@@ -45,8 +45,8 @@ public class CloudinaryService {
         System.out.println("Loại file: " + file.getContentType());
 
         // Kiểm tra kích thước file
-        if (file.getSize() > 100 * 1024 * 1024) { // 100MB
-            throw new IOException("File quá lớn (>100MB)");
+        if (file.getSize() > 500 * 1024 * 1024) { // 500MB
+            throw new IOException("File quá lớn (>500MB)");
         }
 
         Map<String, Object> params = new HashMap<>();
@@ -56,35 +56,29 @@ public class CloudinaryService {
         params.put("async", false);
         
         // Thêm các tham số để xử lý file lớn
-        params.put("chunk_size", 6000000); // 6MB chunks
-        params.put("timeout", 60000); // 60 seconds timeout
+        params.put("chunk_size", 20000000); // 20MB chunks
+        params.put("timeout", 300000); // 5 phút timeout
+        params.put("invalidate", true);
+        params.put("use_filename", true);
+        params.put("unique_filename", true);
+        params.put("overwrite", true);
 
-        int maxRetries = 3;
+        int maxRetries = 5;
         int retryCount = 0;
         Exception lastException = null;
 
         while (retryCount < maxRetries) {
             try {
-                System.out.println("Thử upload lần " + (retryCount + 1));
-                Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
-                String secureUrl = (String) uploadResult.get("secure_url");
-                
-                if (secureUrl == null) {
-                    System.out.println("Upload result: " + uploadResult);
-                    throw new IOException("Không nhận được URL từ Cloudinary");
-                }
-                
-                System.out.println("Upload thành công. URL: " + secureUrl);
-                return secureUrl;
+                Map<String, Object> result = cloudinary.uploader().upload(file.getBytes(), params);
+                return (String) result.get("secure_url");
             } catch (Exception e) {
                 lastException = e;
-                System.out.println("Lỗi khi upload file (lần " + (retryCount + 1) + "): " + e.getMessage());
                 retryCount++;
+                System.out.println("Lỗi upload lần " + retryCount + ": " + e.getMessage());
                 
                 if (retryCount < maxRetries) {
                     try {
-                        // Đợi 5 giây trước khi thử lại
-                        Thread.sleep(5000);
+                        Thread.sleep(5000); // Đợi 5 giây trước khi thử lại
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         throw new IOException("Upload bị gián đoạn", ie);
@@ -93,6 +87,7 @@ public class CloudinaryService {
             }
         }
 
-        throw new IOException("Không thể upload file sau " + maxRetries + " lần thử. Lỗi cuối: " + lastException.getMessage());
+        throw new IOException("Không thể upload file sau " + maxRetries + " lần thử. Lỗi cuối: " + 
+            (lastException != null ? lastException.getMessage() : "Không xác định"));
     }
 }
