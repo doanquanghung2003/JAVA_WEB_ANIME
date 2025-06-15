@@ -104,8 +104,11 @@ public class AnimeAdminController {
                        @RequestParam(required = false) MultipartFile[] episodes,
                        Model model) {
         try {
+            System.out.println("Bắt đầu thêm anime mới: " + animeName);
+            
             // Validate input
             if (animeName == null || animeName.trim().isEmpty()) {
+                System.out.println("Lỗi: Tên anime không được để trống");
                 model.addAttribute("error", "Tên anime không được để trống");
                 return "redirect:/admin/anime/add?error=name";
             }
@@ -113,6 +116,7 @@ public class AnimeAdminController {
             // Check if category exists
             Optional<CategoryAnime> categoryAnime = categoryAnimeRepository.findById(category_anime_id);
             if (categoryAnime.isEmpty()) {
+                System.out.println("Lỗi: Không tìm thấy danh mục với ID: " + category_anime_id);
                 model.addAttribute("error", "Danh mục không tồn tại");
                 return "redirect:/admin/anime/add?error=category";
             }
@@ -121,49 +125,78 @@ public class AnimeAdminController {
             String imageUrl = null;
             String trailerUrl = null;
             try {
+                System.out.println("Đang upload ảnh...");
                 imageUrl = cloudinaryService.uploadFile(image);
+                System.out.println("Upload ảnh thành công: " + imageUrl);
+                
+                System.out.println("Đang upload trailer...");
                 trailerUrl = cloudinaryService.uploadFile(trailer);
+                System.out.println("Upload trailer thành công: " + trailerUrl);
             } catch (IOException e) {
+                System.out.println("Lỗi upload file: " + e.getMessage());
+                e.printStackTrace();
                 model.addAttribute("error", "Lỗi upload file: " + e.getMessage());
                 return "redirect:/admin/anime/add?error=upload";
             }
 
             // Create and save anime
-            Anime anime = new Anime();
-            anime.setAnimeName(animeName);
-            anime.setTitle(title);
-            anime.setDescription(description);
-            anime.setHashtag(hashtag);
-            anime.setImageUrl(imageUrl);
-            anime.setTrailerUrl(trailerUrl);
-            anime.setLink(link);
-            anime.setCategoryAnime(categoryAnime.get());
-            anime.setViewCount(0);
-            anime.setRating(0.0);
+            try {
+                System.out.println("Đang tạo anime mới...");
+                Anime anime = new Anime();
+                anime.setAnimeName(animeName);
+                anime.setTitle(title);
+                anime.setDescription(description);
+                anime.setHashtag(hashtag);
+                anime.setImageUrl(imageUrl);
+                anime.setTrailerUrl(trailerUrl);
+                anime.setLink(link);
+                anime.setCategoryAnime(categoryAnime.get());
+                anime.setViewCount(0);
+                anime.setRating(0.0);
 
-            animeRepo.save(anime);
+                System.out.println("Đang lưu anime vào database...");
+                animeRepo.save(anime);
+                System.out.println("Lưu anime thành công với ID: " + anime.getId());
 
-            // Save episodes if any
-            if (episodes != null && episodes.length > 0) {
-                for (int i = 0; i < episodeCount; i++) {
-                    if (i < episodes.length && episodes[i] != null && !episodes[i].isEmpty()) {
-                        try {
-                            String episodeVideoUrl = cloudinaryService.uploadFile(episodes[i]);
-                            Episode episode = new Episode();
-                            episode.setEpisodeNumber(i + 1);
-                            episode.setVideoUrl(episodeVideoUrl);
-                            episode.setAnime(anime);
-                            episodeRepository.save(episode);
-                        } catch (IOException e) {
-                            model.addAttribute("error", "Lỗi upload tập " + (i + 1) + ": " + e.getMessage());
-                            return "redirect:/admin/anime/add?error=episode";
+                // Save episodes if any
+                if (episodes != null && episodes.length > 0) {
+                    System.out.println("Bắt đầu xử lý " + episodeCount + " tập phim...");
+                    for (int i = 0; i < episodeCount; i++) {
+                        if (i < episodes.length && episodes[i] != null && !episodes[i].isEmpty()) {
+                            try {
+                                System.out.println("Đang upload tập " + (i + 1) + "...");
+                                String episodeVideoUrl = cloudinaryService.uploadFile(episodes[i]);
+                                System.out.println("Upload tập " + (i + 1) + " thành công: " + episodeVideoUrl);
+                                
+                                Episode episode = new Episode();
+                                episode.setEpisodeNumber(i + 1);
+                                episode.setVideoUrl(episodeVideoUrl);
+                                episode.setAnime(anime);
+                                
+                                System.out.println("Đang lưu tập " + (i + 1) + " vào database...");
+                                episodeRepository.save(episode);
+                                System.out.println("Lưu tập " + (i + 1) + " thành công");
+                            } catch (IOException e) {
+                                System.out.println("Lỗi upload tập " + (i + 1) + ": " + e.getMessage());
+                                e.printStackTrace();
+                                model.addAttribute("error", "Lỗi upload tập " + (i + 1) + ": " + e.getMessage());
+                                return "redirect:/admin/anime/add?error=episode";
+                            }
                         }
                     }
                 }
-            }
 
-            return "redirect:/admin/anime?success";
+                System.out.println("Thêm anime thành công!");
+                return "redirect:/admin/anime?success";
+            } catch (Exception e) {
+                System.out.println("Lỗi khi lưu anime vào database: " + e.getMessage());
+                e.printStackTrace();
+                model.addAttribute("error", "Lỗi khi lưu anime: " + e.getMessage());
+                return "redirect:/admin/anime/add?error=database";
+            }
         } catch (Exception e) {
+            System.out.println("Lỗi không xác định: " + e.getMessage());
+            e.printStackTrace();
             model.addAttribute("error", "Lỗi không xác định: " + e.getMessage());
             return "redirect:/admin/anime/add?error=unknown";
         }

@@ -60,7 +60,10 @@ public class CommentController {
             // Trả kết quả phản hồi JSON
             return ResponseEntity.ok(Map.of(
                     "comment", newComment.getComment(),
-                    "account", accOpt.get().getUsername()
+                    "account", Map.of(
+                        "username", accOpt.get().getUsername(),
+                        "avatarUrl", accOpt.get().getAvatarUrl()
+                    )
             ));
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,55 +7,6 @@
 </head>
 <body>
 
-<script>
-    $(function () {
-        $("#message").hide();
-
-        $("#btnSave").click(function (e) {
-            e.preventDefault();
-            let animeName = $('#animeName').val();
-            let categoryId = $('#category_anime_id').val();
-
-            if (animeName === '') {
-                $("#message").html("Phải nhập tên anime");
-                $("#message").show();
-                return;
-            }
-
-            if (!categoryId) {
-                $("#message").html("Vui lòng chọn danh mục");
-                $("#message").show();
-                return;
-            }
-
-            $("#frmSave").submit();
-        });
-    });
-
-    function generateEpisodeInputs() {
-        const episodeCount = document.getElementById('episodeCount').value;
-        if (episodeCount < 1) {
-            alert("Số lượng tập phải lớn hơn 0");
-            document.getElementById('episodeCount').value = 1;
-            return;
-        }
-        
-        const episodeInputsContainer = document.getElementById('episodeInputs');
-        episodeInputsContainer.innerHTML = '';
-
-        for (let i = 1; i <= episodeCount; i++) {
-            const inputHTML = `
-            <div class="mb-3">
-                <label for="episode${i}" class="form-label">Tập ${i}:</label>
-                <input class="form-control" type="file" id="episode${i}" name="episodes" accept="video/*">
-            </div>
-        `;
-            episodeInputsContainer.insertAdjacentHTML('beforeend', inputHTML);
-        }
-    }
-
-</script>
-
 <div layout:fragment="content">
     <!-- Form Start -->
     <div class="container-fluid pt-2 px-2 d-flex justify-content-center">
@@ -63,17 +14,8 @@
             <div class="bg-secondary rounded p-4">
                 <h6 class="mb-4 text-center">Add Anime</h6>
                 
-                <!-- Error Message -->
-                <div th:if="${param.error}" class="alert alert-danger" role="alert">
-                    <span th:text="${error}">Error message</span>
-                </div>
-                
-                <!-- Success Message -->
-                <div th:if="${param.success}" class="alert alert-success" role="alert">
-                    Thêm anime thành công!
-                </div>
-
-                <div id="message" class="alert alert-danger" role="alert"></div>
+                <!-- Thêm phần tử message -->
+                <div id="message" class="alert alert-danger" style="display: none;"></div>
 
                 <form th:action="@{/admin/anime/save}" method="post" enctype="multipart/form-data" id="frmSave">
                     <div class="mb-3">
@@ -115,7 +57,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="episodeCount" class="form-label">Số lượng tập:</label>
-                        <input type="number" class="form-control" id="episodeCount" name="episodeCount" min="1" value="1" required onchange="generateEpisodeInputs()">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="episodeCount" name="episodeCount" min="1" value="1" required>
+                            <button type="button" class="btn btn-primary" id="btnConfirmEpisodes">Xác nhận</button>
+                        </div>
                     </div>
                     <div id="episodeInputs"></div>
                     <button type="submit" class="btn btn-primary w-100" id="btnSave">Add Anime</button>
@@ -125,6 +70,9 @@
     </div>
     <!-- Form End -->
 </div>
+
+<!-- Include scripts từ layout -->
+<div th:replace="~{/layouts/admin-layout :: scripts}"></div>
 
 </body>
 </html>

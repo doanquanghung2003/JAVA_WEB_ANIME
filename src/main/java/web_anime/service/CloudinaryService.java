@@ -36,24 +36,63 @@ public class CloudinaryService {
 //        return fileUrl;
 //    }
     public String uploadFile(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IOException("File không được để trống");
+        }
+
+        System.out.println("Bắt đầu upload file: " + file.getOriginalFilename());
+        System.out.println("Kích thước file: " + file.getSize() + " bytes");
+        System.out.println("Loại file: " + file.getContentType());
+
+        // Kiểm tra kích thước file
+        if (file.getSize() > 100 * 1024 * 1024) { // 100MB
+            throw new IOException("File quá lớn (>100MB)");
+        }
+
         Map<String, Object> params = new HashMap<>();
-
-        // Auto optimize định dạng
         params.put("resource_type", "auto");
-
-        // Tối ưu chất lượng ảnh
         params.put("quality", "auto:best");
-
-        // Tối ưu định dạng video
         params.put("video_codec", "auto");
+        params.put("async", false);
+        
+        // Thêm các tham số để xử lý file lớn
+        params.put("chunk_size", 6000000); // 6MB chunks
+        params.put("timeout", 60000); // 60 seconds timeout
 
-        // Chế độ upload nhanh
-        params.put("async", true);
+        int maxRetries = 3;
+        int retryCount = 0;
+        Exception lastException = null;
 
-        // Giảm kích thước file
-        params.put("transformation", new Transformation().width(1920).height(1080).crop("limit"));
+        while (retryCount < maxRetries) {
+            try {
+                System.out.println("Thử upload lần " + (retryCount + 1));
+                Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
+                String secureUrl = (String) uploadResult.get("secure_url");
+                
+                if (secureUrl == null) {
+                    System.out.println("Upload result: " + uploadResult);
+                    throw new IOException("Không nhận được URL từ Cloudinary");
+                }
+                
+                System.out.println("Upload thành công. URL: " + secureUrl);
+                return secureUrl;
+            } catch (Exception e) {
+                lastException = e;
+                System.out.println("Lỗi khi upload file (lần " + (retryCount + 1) + "): " + e.getMessage());
+                retryCount++;
+                
+                if (retryCount < maxRetries) {
+                    try {
+                        // Đợi 5 giây trước khi thử lại
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Upload bị gián đoạn", ie);
+                    }
+                }
+            }
+        }
 
-        Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
-        return (String) uploadResult.get("secure_url");
+        throw new IOException("Không thể upload file sau " + maxRetries + " lần thử. Lỗi cuối: " + lastException.getMessage());
     }
 }

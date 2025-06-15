@@ -196,8 +196,6 @@
     </div>
 </div>
 
-
-
 <!-- JavaScript Libraries -->
 <script th:src="@{https://code.jquery.com/jquery-3.4.1.min.js}"></script>
 <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js}"></script>
@@ -211,6 +209,122 @@
 
 <!-- Template Javascript -->
 <script th:src="@{/js-admin/main.js}"></script>
+
+<!-- Custom Scripts -->
+<script th:fragment="scripts">
+    // Script cho trang thêm anime
+    $(document).ready(function() {
+        // Chỉ chạy script này khi ở trang thêm anime
+        if ($('#frmSave').length > 0) {
+            // Ẩn thông báo lỗi chung khi trang tải
+            $("#message").hide();
+
+            // Ẩn container chứa input tập phim ban đầu
+            $("#episodeInputs").hide();
+
+            // Xử lý sự kiện khi bấm nút xác nhận
+            $("#btnConfirmEpisodes").click(function() {
+                const episodeCount = parseInt($("#episodeCount").val());
+                if (episodeCount > 0) {
+                    generateEpisodeInputs();
+                    $("#episodeInputs").show();
+                } else {
+                    $("#message").html("Vui lòng nhập số lượng tập hợp lệ!").show();
+                }
+            });
+
+            $("#btnSave").click(function(e) {
+                e.preventDefault(); // Ngăn form submit mặc định
+                let animeName = $('#animeName').val();
+                let categoryId = $('#category_anime_id').val();
+                let hasError = false;
+
+                // Kiểm tra tên anime
+                if (animeName.trim() === '') {
+                    $("#message").html("Phải nhập tên anime").show();
+                    return;
+                }
+
+                // Kiểm tra danh mục
+                if (!categoryId) {
+                    $("#message").html("Vui lòng chọn danh mục").show();
+                    return;
+                }
+
+                // Kiểm tra các file video trước khi submit
+                const videoInputs = $('input[name="episodes"]');
+                videoInputs.each(function() {
+                    if (!validateVideoFile(this)) {
+                        hasError = true;
+                    }
+                });
+
+                if (!hasError) {
+                    $("#message").hide();
+                    $("#frmSave").submit();
+                } else {
+                    $("#message").html("Vui lòng sửa các lỗi trong file video.").show();
+                }
+            });
+        }
+    });
+
+    // Hàm tạo input cho các tập phim
+    function generateEpisodeInputs() {
+        const episodeCount = parseInt($("#episodeCount").val()) || 1;
+        const episodeInputsContainer = $("#episodeInputs");
+        
+        if (episodeInputsContainer.length === 0) {
+            console.error("Cannot find episodeInputs container!");
+            return;
+        }
+
+        episodeInputsContainer.empty(); // Xóa các input cũ
+
+        for (let i = 1; i <= episodeCount; i++) {
+            const inputHTML = `
+            <div class="mb-3">
+                <label class="form-label">Tập ${i}:</label>
+                <div class="input-group">
+                    <input class="form-control" type="file" name="episodes" accept="video/*" required onchange="validateVideoFile(this)">
+                    <span class="input-group-text">Video</span>
+                </div>
+                <small class="text-danger" style="display: none;"></small>
+            </div>
+            `;
+            episodeInputsContainer.append(inputHTML);
+        }
+    }
+
+    // Hàm kiểm tra file video
+    function validateVideoFile(input) {
+        const file = input.files[0];
+        const errorElement = $(input).closest('.input-group').parent().find('.text-danger');
+
+        if (file) {
+            // Kiểm tra kích thước file (giới hạn 500MB)
+            const maxSize = 500 * 1024 * 1024; // 500MB
+            if (file.size > maxSize) {
+                errorElement.text("Kích thước file không được vượt quá 500MB.").show();
+                return false;
+            }
+
+            // Kiểm tra định dạng file
+            const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+            if (!allowedTypes.includes(file.type)) {
+                errorElement.text("Chỉ chấp nhận file video (MP4, WebM, OGG).").show();
+                return false;
+            }
+
+            // Nếu không có lỗi
+            errorElement.hide();
+            return true;
+        } else {
+            errorElement.text("Vui lòng chọn file video.").show();
+            return false;
+        }
+    }
+</script>
 
 </body>
 

@@ -190,10 +190,10 @@
                   newComment.classList.add("anime__review__item");
                   newComment.innerHTML = `
                 <div class="anime__review__item__pic">
-                    <img src="/images/anime/default-avatar.png" alt="">
+                    <img class="rounded-circle" src="${data.account.avatarUrl || '/img-admin/default-avatar.png'}" alt="" style="width: 40px; height: 40px;">
                 </div>
                 <div class="anime__review__item__text">
-                    <h6>${username} - <span>Just now</span></h6>
+                    <h6>${data.account.username} - <span>Just now</span></h6>
                     <p>${data.comment}</p>
                 </div>
             `;
